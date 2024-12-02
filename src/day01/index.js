@@ -6,7 +6,7 @@ function part1(lines) {
     let total = 0;
 
     for (let i = 0; i < newLines.length; i++) {
-        total += Math.abs(firstColumn[i], secondColumn[i]);
+        total += Math.abs(firstColumn[i] - secondColumn[i]);
     }
 
     return total;
