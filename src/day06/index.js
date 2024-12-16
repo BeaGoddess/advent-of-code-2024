@@ -1,83 +1,66 @@
 function move(matrix, position, direction, count, moves) {
+    const visited = new Set(moves.map(pos => `${pos.x},${pos.y}`));
+    let currentPos = position;
+    let currentDir = direction;
+    let totalCount = count;
 
-    switch (direction) {
-        case 'up':
-            if (position.y - 1 < 0) {
-                return count + 1;
+    while (true) {
+        const nextPos = { ...currentPos };
+
+        switch (currentDir) {
+            case 'up':
+                nextPos.y--;
+                break;
+            case 'down':
+                nextPos.y++;
+                break;
+            case 'left':
+                nextPos.x--;
+                break;
+            case 'right':
+                nextPos.x++;
+                break;
+        }
+
+        // Check bounds
+        if (nextPos.x < 0 || nextPos.x >= matrix[0].length ||
+            nextPos.y < 0 || nextPos.y >= matrix.length) {
+            return totalCount + 1;
+        }
+
+        // Check wall collision
+        if (matrix[nextPos.y][nextPos.x] === '#') {
+            // Change direction
+            switch (currentDir) {
+                case 'up': currentDir = 'right'; break;
+                case 'right': currentDir = 'down'; break;
+                case 'down': currentDir = 'left'; break;
+                case 'left': currentDir = 'up'; break;
             }
+            continue;
+        }
 
-            if (matrix[position.y - 1][position.x] !== '#') {
-                if (!moves.find(move => move.x === position.x && move.y === position.y - 1)) {
-                    count++;
-                }
+        // Check if position was visited
+        const posKey = `${nextPos.x},${nextPos.y}`;
+        if (!visited.has(posKey)) {
+            totalCount++;
+            visited.add(posKey);
+        }
 
-                return move(matrix, { x: position.x, y: position.y - 1 }, direction, count, [...moves, position]);
-            } else {
-                return move(matrix, position, 'right', count, moves);
-            }
-        case 'down':
-            if (position.y + 1 >= matrix.length) {
-                return count + 1;
-            }
-
-            if (matrix[position.y + 1][position.x] !== '#') {
-                if (!moves.find(move => move.x === position.x && move.y === position.y + 1)) {
-                    count++;
-                }
-
-                return move(matrix, { x: position.x, y: position.y + 1 }, direction, count, [...moves, position]);
-            } else {
-                return move(matrix, position, 'left', count, moves);
-            }
-
-        case 'left':
-            if (position.x - 1 < 0) {
-                return count + 1;
-            }
-
-            if (matrix[position.y][position.x - 1] !== '#') {
-                if (!moves.find(move => move.x === position.x - 1 && move.y === position.y)) {
-                    count++;
-                }
-
-                return move(matrix, { x: position.x - 1, y: position.y }, direction, count, [...moves, position]);
-            } else {
-                return move(matrix, position, 'up', count, moves);
-            }
-
-        case 'right':
-            if (position.x + 1 >= matrix[position.y].length) {
-                return count + 1;
-            }
-
-            if (matrix[position.y][position.x + 1] !== '#') {
-                if (!moves.find(move => move.x === position.x + 1 && move.y === position.y)) {
-                    count++;
-                }
-
-                return move(matrix, { x: position.x + 1, y: position.y }, direction, count, [...moves, position]);
-            } else {
-                return move(matrix, position, 'down', count, moves);
-            }
+        currentPos = nextPos;
     }
 }
 
-
 function part1(lines) {
     let matrix = lines.map(line => line.split(''));
-
     let position = { x: 0, y: 0 };
 
-    for (let y = 0; y < matrix.length; y++) {
-        for (let x = 0; x < matrix[y].length; x++) {
-            if (matrix[y][x] === '^') {
-                position = { x, y };
-            }
-        }
-    }
+    // Find starting position marked by '^'
+    const startRow = matrix.findIndex(row => row.includes('^'));
+    const startCol = matrix[startRow].indexOf('^');
+    position = { x: startCol, y: startRow };
 
     const count = move(matrix, position, 'up', 0, [position]);
-
     return count;
 }
 

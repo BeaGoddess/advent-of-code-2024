@@ -1,8 +1,6 @@
-
 const { readFile } = require('./readFile');
 
 function getFiles(number) {
-
     const examplePart1 = readFile(`src/day${number}/example-part1.txt`);
     const examplePart2 = readFile(`src/day${number}/example-part2.txt`);
     const inputPart1 = readFile(`src/day${number}/input-part1.txt`);
